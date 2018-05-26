@@ -1,0 +1,36 @@
+.pass1 {
+-fx-border-color:black;
+-fx-border-style:solid;
+-fx-set-fx-text-fill: black;
+-fx-background-color: #dcb35c;
+-fx-effect: innershadow( gaussian, rgba( 0, 0, 0, 0.5 ), 10, 0, 5, 5 );
+}
+.pass2 {
+-fx-border-color:black;
+-fx-border-style:solid;
+-fx-set-fx-text-fill: black;
+-fx-background-color: #dcb35c;
+}
+.pass2:hover {
+-fx-effect: innershadow( gaussian, rgba( 0, 0, 0, 0.5 ), 10, 0, 5, 5 );
+}
+.restart {
+-fx-border-color:black;
+-fx-border-style:solid;
+-fx-set-fx-text-fill: black;
+-fx-background-color: #dcb35c;
+}
+.restart:hover {
+-fx-effect: innershadow( gaussian, rgba( 0, 0, 0, 0.5 ), 10, 0, 5, 5 );
+}
+.vBox {
+-fx-border-color:black;
+-fx-border-style:solid;
+-fx-border-width:3px;
+-fx-background-color:#FFFACD
+}
+.label {
+-fx-border-color:black;
+-fx-border-style:solid;
+-fx-border-width:0 0 3 0
+}
