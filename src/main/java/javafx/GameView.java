@@ -120,6 +120,7 @@ public class GameView extends Application {
             updateStatus();
             inProcess = true;
             passesInARow.set(0);
+            pass.getStyleClass().add("pass1");
         });
         restart.setLayoutX(screenHeight / 90);
         restart.setLayoutY(screenHeight * 2 / 3);

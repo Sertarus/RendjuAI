@@ -14,8 +14,8 @@
       <entry name="?*.css" />
     </wildcardResourcePatterns>
     <bytecodeTargetLevel target="9">
-      <module name="ProgrammingTask3_main" target="1.8" />
-      <module name="ProgrammingTask3_test" target="1.8" />
+      <module name="ProgrammingTask3_main" target="9" />
+      <module name="ProgrammingTask3_test" target="9" />
     </bytecodeTargetLevel>
   </component>
 </project>

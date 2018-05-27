@@ -123,7 +123,7 @@ public class Board {
 
     @Nullable
     private List<BoardPoint> checkRowInDirection(BoardPoint direction, int directionCoefficient,
-                                     BoardPoint startPoint, int length) {
+                                                 BoardPoint startPoint, int length) {
         BoardPoint currentPoint = startPoint.minus(direction.times(directionCoefficient));
         int numberOfStones = 0;
         List<BoardPoint> row = new ArrayList<>();
@@ -166,7 +166,8 @@ public class Board {
                             true
                     };
                     for (int k = 0; k <= 3; k++) {
-                        if ((get(possibleObstacles[k]) != null || !stones.containsKey(possibleObstacles[k])) && length == 3) {
+                        if ((get(possibleObstacles[k]) != null || !stones.containsKey(possibleObstacles[k]))
+                                && length == 3) {
                             emptyPoints[k] = false;
                         }
                     }
@@ -191,5 +192,48 @@ public class Board {
 
     private boolean blockedPoint(BoardPoint boardPoint) {
         return get(boardPoint) != null || !stones.containsKey(boardPoint);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj instanceof Board) {
+            Board other = (Board) obj;
+            return width == other.width && height == other.height && stones.equals(other.stones);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 13;
+        result = 17 * result + width;
+        result = result * 7 + height;
+        return result + stones.hashCode() + 23 * (stonesOnBoard + 1);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                Stone stone = get(i, j);
+                if (stone == null) {
+                    if (j != 14) sb.append("- ");
+                    else sb.append("-");
+                    continue;
+                }
+                switch (stone) {
+                    case BLACK:
+                        sb.append("B ");
+                        break;
+                    case WHITE:
+                        sb.append("W ");
+                        break;
+                }
+            }
+            if (i != 14) sb.append("\n");
+        }
+        return sb.toString();
     }
 }
