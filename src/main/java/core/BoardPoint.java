@@ -49,6 +49,6 @@ public final class BoardPoint {
 
     @Override
     public String toString() {
-        return "" + vertical + horizontal;
+        return "" + vertical + " " + horizontal;
     }
 }

@@ -1,5 +1,6 @@
 import core.Board;
 import core.BoardPoint;
+import core.Player;
 import core.Stone;
 import org.junit.jupiter.api.Test;
 
@@ -7,7 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardTest {
 
-    Board clearBoard = new Board(15, 15);
+    private Board clearBoard = new Board(15, 15);
+
+    private Player black = new Player(Stone.BLACK,null);
 
     @Test
     public void getStonesOnBoard() {
@@ -32,14 +35,14 @@ public class BoardTest {
 
     @Test
     public void getTurn() {
-        assertEquals(Stone.BLACK, clearBoard.getTurn());
+        assertEquals(Stone.BLACK, clearBoard.getTurn().getSide());
     }
 
     @Test
     public void setTurn() {
         Board board = new Board(15, 15);
-        board.setTurn(Stone.WHITE);
-        assertEquals(Stone.WHITE, board.getTurn());
+        board.setTurn(new Player(Stone.WHITE,null));
+        assertEquals(Stone.WHITE, board.getTurn().getSide());
     }
 
     @Test
@@ -61,15 +64,16 @@ public class BoardTest {
                 "- - - - - - - - - - - - - - -\n" +
                 "- - - - - - - - - - - - - - -\n" +
                 "- - - - - - - - - - - - - - -", board.toString());
-        board.setTurn(Stone.BLACK);
+        board.setTurn(black);
         board.makeTurn(8, 8);
-        board.setTurn(Stone.BLACK);
+        board.setTurn(black);
         board.makeTurn(9, 9);
-        board.setTurn(Stone.BLACK);
+        board.setTurn(black);
         board.makeTurn(7, 9);
-        board.setTurn(Stone.BLACK);
+        board.setTurn(black);
         board.makeTurn(8, 10);
-        assertEquals(null, board.get(8, 9));
+        board.setTurn(black);
+        assertEquals(null, board.get(board.makeTurn(8, 9)));
 
     }
 
@@ -78,7 +82,7 @@ public class BoardTest {
         Board board = new Board(15, 15);
         for (int i = 0; i < 5; i++) {
             board.makeTurn(0, i);
-            board.setTurn(Stone.BLACK);
+            board.setTurn(black);
         }
         assertEquals(Stone.BLACK, board.winner());
     }

@@ -14,11 +14,20 @@ public class Board {
 
     private int stonesOnBoard = 0;
 
+    private Player firstPlayer = new Player(Stone.BLACK, null);
+
+    private Player secondPlayer = new Player(Stone.WHITE, null);
+
+    private ComputerLogic firstComputer = new ComputerLogic();
+
+    private ComputerLogic secondComputer = new ComputerLogic();
+
+
     @NotNull
     private final Map<BoardPoint, Stone> stones = new HashMap<>();
 
     @NotNull
-    private Stone turn = Stone.BLACK;
+    private Player turn = firstPlayer;
 
     public Board(int width, int height) {
         this.width = width;
@@ -30,8 +39,29 @@ public class Board {
         }
     }
 
+    @NotNull
+    public Map<BoardPoint, Stone> getStones() {
+        return stones;
+    }
+
     public int getStonesOnBoard() {
         return stonesOnBoard;
+    }
+
+    public Player getFirstPlayer() {
+        return firstPlayer;
+    }
+
+    public Player getSecondPlayer() {
+        return secondPlayer;
+    }
+
+    public ComputerLogic getFirstComputer() {
+        return firstComputer;
+    }
+
+    public ComputerLogic getSecondComputer() {
+        return secondComputer;
     }
 
     public void clear() {
@@ -39,12 +69,21 @@ public class Board {
             stones.put(boardPoint, null);
         }
         stonesOnBoard = 0;
-        turn = Stone.BLACK;
+        turn = firstPlayer;
+    }
+
+    public BoardPoint findPoint(int vertical, int horizontal) {
+        for (BoardPoint point : stones.keySet()) {
+            if (point.getVertical() == vertical && point.getHorizontal() == horizontal) {
+                return point;
+            }
+        }
+        return null;
     }
 
     @Nullable
     public Stone get(int vertical, int horizontal) {
-        return stones.get(new BoardPoint(vertical, horizontal));
+        return stones.get(findPoint(vertical, horizontal));
     }
 
     @Nullable
@@ -53,21 +92,22 @@ public class Board {
     }
 
     @NotNull
-    public Stone getTurn() {
+    public Player getTurn() {
         return turn;
     }
 
-    public void setTurn(@NotNull Stone turn) {
+    public void setTurn(@NotNull Player turn) {
         this.turn = turn;
     }
 
     public BoardPoint makeTurn(int vertical, int horizontal) {
-        BoardPoint boardPoint = new BoardPoint(vertical, horizontal);
+        BoardPoint boardPoint = findPoint(vertical, horizontal);
         if (vertical < 0 || vertical >= width || horizontal < 0 || horizontal >= height) return null;
-        if (stones.get(boardPoint) == null && (getTurn() == Stone.WHITE || isPlayable(boardPoint))) {
-            stones.put(boardPoint, turn);
+        if (stones.get(boardPoint) == null && (getTurn().getSide() == Stone.WHITE || isPlayable(boardPoint))) {
+            stones.put(boardPoint, turn.getSide());
             stonesOnBoard++;
-            turn = turn.opposite();
+            if (turn == firstPlayer) turn = secondPlayer;
+            else turn = firstPlayer;
             return boardPoint;
         }
         return null;
@@ -89,7 +129,7 @@ public class Board {
             Stone startStone = stones.get(boardPoint);
             if (startStone == null && !countEmptyPoints) continue;
             for (int i = 0; i < 4; i++) {
-                BoardPoint current = new BoardPoint(boardPoint.getVertical(), boardPoint.getHorizontal());
+                BoardPoint current = findPoint(boardPoint.getVertical(), boardPoint.getHorizontal());
                 int length = 1;
                 for (; length < LENGTH_TO_WIN; length++) {
                     current = current.plus(DIRECTIONS[i]);
@@ -116,20 +156,20 @@ public class Board {
         return findRow(false);
     }
 
-    private boolean isPlayable(BoardPoint boardPoint) {
-        return findPotentialRow(6, boardPoint) == 0 && findPotentialRow(3, boardPoint) <= 1 &&
-                findPotentialRow(4, boardPoint) <= 1;
+    public boolean isPlayable(BoardPoint boardPoint) {
+        return findPotentialRow(6, boardPoint, Stone.BLACK) == 0 && findPotentialRow(3, boardPoint, Stone.BLACK) <= 1 &&
+                findPotentialRow(4, boardPoint, Stone.BLACK) <= 1;
     }
 
     @Nullable
     private List<BoardPoint> checkRowInDirection(BoardPoint direction, int directionCoefficient,
-                                                 BoardPoint startPoint, int length) {
+                                                 BoardPoint startPoint, int length, Stone stone) {
         BoardPoint currentPoint = startPoint.minus(direction.times(directionCoefficient));
         int numberOfStones = 0;
         List<BoardPoint> row = new ArrayList<>();
         for (int i = 0; i <= length; i++) {
-            if (get(currentPoint) == Stone.BLACK) numberOfStones++;
-            else if (get(currentPoint) == Stone.WHITE) break;
+            if (get(currentPoint) == stone) numberOfStones++;
+            else if (get(currentPoint) == stone.opposite()) break;
             row.add(currentPoint);
             currentPoint = currentPoint.plus(direction);
         }
@@ -138,18 +178,17 @@ public class Board {
                 row.remove(row.size() - 1);
             if (stones.get(row.get(0)) == null && !row.get(0).equals(startPoint)) row.remove(0);
             return row;
-
         }
         return null;
     }
 
-    private double findPotentialRow(int length, BoardPoint boardPoint) {
+    private double findPotentialRow(int length, BoardPoint boardPoint, Stone stone) {
         List<Integer> unnecessaryDirections = new ArrayList<>();
         double numberOfDetectedRows = 0;
         for (int i = 0; i <= 7; i++) {
             if (unnecessaryDirections.contains(i)) continue;
             for (int j = 1; j <= length; j++) {
-                List<BoardPoint> row = checkRowInDirection(DIRECTIONS[i], j, boardPoint, length);
+                List<BoardPoint> row = checkRowInDirection(DIRECTIONS[i], j, boardPoint, length, stone);
                 if (row != null) {
                     unnecessaryDirections.add(i + 4);
                     BoardPoint linearCoefficient = row.get(1).minus(row.get(0));
@@ -172,7 +211,7 @@ public class Board {
                         }
                     }
                     boolean twoRowsOfFourInSevenCells = (length == 4 && row.size() == 5 &&
-                            (get(possibleObstacles[2]) == Stone.BLACK || get(possibleObstacles[3]) == Stone.BLACK));
+                            (get(possibleObstacles[2]) == stone || get(possibleObstacles[3]) == stone));
                     if (length == 4 && ((blockedPoint(possibleObstacles[2]) &&
                             (blockedPoint(possibleObstacles[3]) || blockedPoint(possibleObstacles[1]))) ||
                             (blockedPoint(possibleObstacles[3]) && (blockedPoint(possibleObstacles[2]) ||
@@ -217,7 +256,7 @@ public class Board {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                Stone stone = get(i, j);
+                Stone stone = get(j, i);
                 if (stone == null) {
                     if (j != 14) sb.append("- ");
                     else sb.append("-");
