@@ -2,6 +2,7 @@ package javafx;
 
 import core.Board;
 import core.BoardPoint;
+import core.ComputerLogic;
 import core.Stone;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -232,13 +233,13 @@ public class GameView extends Application {
                 board.getFirstPlayer().setComputerLogic(null);
             }
             if (rb2.isSelected()) {
-                board.getFirstPlayer().setComputerLogic(board.getFirstComputer());
+                board.getFirstPlayer().setComputerLogic(new ComputerLogic());
             }
             if (rb3.isSelected()) {
                 board.getSecondPlayer().setComputerLogic(null);
             }
             if (rb4.isSelected()) {
-                board.getSecondPlayer().setComputerLogic(board.getSecondComputer());
+                board.getSecondPlayer().setComputerLogic(new ComputerLogic());
             }
             inProcess = true;
             if (board.getFirstPlayer().getComputerLogic() != null &&

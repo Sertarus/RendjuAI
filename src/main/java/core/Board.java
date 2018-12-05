@@ -18,10 +18,6 @@ public class Board {
 
     private Player secondPlayer = new Player(Stone.WHITE, null);
 
-    private ComputerLogic firstComputer = new ComputerLogic();
-
-    private ComputerLogic secondComputer = new ComputerLogic();
-
 
     @NotNull
     private final Map<BoardPoint, Stone> stones = new HashMap<>();
@@ -39,11 +35,6 @@ public class Board {
         }
     }
 
-    @NotNull
-    public Map<BoardPoint, Stone> getStones() {
-        return stones;
-    }
-
     public int getStonesOnBoard() {
         return stonesOnBoard;
     }
@@ -56,14 +47,6 @@ public class Board {
         return secondPlayer;
     }
 
-    public ComputerLogic getFirstComputer() {
-        return firstComputer;
-    }
-
-    public ComputerLogic getSecondComputer() {
-        return secondComputer;
-    }
-
     public void clear() {
         for (BoardPoint boardPoint : stones.keySet()) {
             stones.put(boardPoint, null);
@@ -72,18 +55,9 @@ public class Board {
         turn = firstPlayer;
     }
 
-    public BoardPoint findPoint(int vertical, int horizontal) {
-        for (BoardPoint point : stones.keySet()) {
-            if (point.getVertical() == vertical && point.getHorizontal() == horizontal) {
-                return point;
-            }
-        }
-        return null;
-    }
-
     @Nullable
     public Stone get(int vertical, int horizontal) {
-        return stones.get(findPoint(vertical, horizontal));
+        return stones.get(new BoardPoint(vertical,horizontal));
     }
 
     @Nullable
@@ -101,7 +75,7 @@ public class Board {
     }
 
     public BoardPoint makeTurn(int vertical, int horizontal) {
-        BoardPoint boardPoint = findPoint(vertical, horizontal);
+        BoardPoint boardPoint = new BoardPoint(vertical,horizontal);
         if (vertical < 0 || vertical >= width || horizontal < 0 || horizontal >= height) return null;
         if (stones.get(boardPoint) == null && (getTurn().getSide() == Stone.WHITE || isPlayable(boardPoint))) {
             stones.put(boardPoint, turn.getSide());
@@ -125,11 +99,11 @@ public class Board {
     };
 
     private Stone findRow(boolean countEmptyPoints) {
-        for (BoardPoint boardPoint : stones.keySet()) {
-            Stone startStone = stones.get(boardPoint);
+        for (Map.Entry<BoardPoint,Stone> entry : stones.entrySet()) {
+            Stone startStone = entry.getValue();
             if (startStone == null && !countEmptyPoints) continue;
             for (int i = 0; i < 4; i++) {
-                BoardPoint current = findPoint(boardPoint.getVertical(), boardPoint.getHorizontal());
+                BoardPoint current = entry.getKey();
                 int length = 1;
                 for (; length < LENGTH_TO_WIN; length++) {
                     current = current.plus(DIRECTIONS[i]);

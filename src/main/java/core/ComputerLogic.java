@@ -6,20 +6,21 @@ import java.util.*;
 public class ComputerLogic {
     private TreeMap<Integer, BoardPoint> potentialTurns = new TreeMap<>();
 
-    private static final StringBuilder[] rowPattern = new StringBuilder[]{
-            new StringBuilder("SSSSS"),
-            new StringBuilder("_SSSS_"),
-            new StringBuilder("SSSS_"),
-            new StringBuilder("SSS_S"),
-            new StringBuilder("SS_SS"),
-            new StringBuilder("SSS__"),
-            new StringBuilder("_SSS_"),
-            new StringBuilder("SS_S_"),
-            new StringBuilder("SS__S"),
-            new StringBuilder("SS___"),
-            new StringBuilder("_SS__"),
-            new StringBuilder("__SSS__")
-    };
+    private static TreeMap<String, Integer> rowPatterns = new TreeMap<>();
+    static {
+        rowPatterns.put("SSSSS", 10000);
+        rowPatterns.put("_SSSS_", 2000);
+        rowPatterns.put("SSSS_", 1100);
+        rowPatterns.put("SSS_S", 650);
+        rowPatterns.put("SS_SS", 650);
+        rowPatterns.put("SSS__", 250);
+        rowPatterns.put("_SSS_", 330);
+        rowPatterns.put("SS_S_", 180);
+        rowPatterns.put("SS__S", 180);
+        rowPatterns.put("SS___", 70);
+        rowPatterns.put("_SS__", 100);
+        rowPatterns.put("__SSS__", 780);
+    }
 
     public BoardPoint makeComputerTurn(Board board, List<BoardPoint> playedCells) {
         if (potentialTurns.isEmpty() && board.get(7, 7) == null) board.makeTurn(7, 7);
@@ -40,7 +41,7 @@ public class ComputerLogic {
             potentialTurns.remove(potentialTurns.lastKey());
             return bestTurn;
         }
-        return board.findPoint(7, 7);
+        return new BoardPoint(7, 7);
     }
 
     public void clearPotentialTurns() {
@@ -98,20 +99,12 @@ public class ComputerLogic {
         };
         Integer value = new Random().nextInt(5);
         for (String row : rows) {
-            if (row.contains(rowPattern[0])) value += 10000;
-            if (row.contains(rowPattern[1]) || row.contains(rowPattern[1].reverse())) value += 2000;
-            if (row.contains(rowPattern[2]) || row.contains(rowPattern[2].reverse())) value += 1100;
-            if (row.contains(rowPattern[3]) || row.contains(rowPattern[3].reverse()) ||
-                    row.contains(rowPattern[4]) || row.contains(rowPattern[4].reverse())) value += 650;
-            if (row.contains(rowPattern[5]) || row.contains(rowPattern[5].reverse()) ||
-                    row.contains(rowPattern[6]) || row.contains(rowPattern[6].reverse())) value += 330;
-            if (row.contains(rowPattern[6]) || row.contains(rowPattern[6].reverse())) value += 330;
-            if (row.contains(rowPattern[5]) || row.contains(rowPattern[5].reverse())) value += 250;
-            if (row.contains(rowPattern[7]) || row.contains(rowPattern[7].reverse()) ||
-                    row.contains(rowPattern[8]) || row.contains(rowPattern[8].reverse())) value += 180;
-            if (row.contains(rowPattern[10]) || row.contains(rowPattern[10].reverse())) value += 100;
-            if (row.contains(rowPattern[9]) || row.contains(rowPattern[9].reverse())) value += 70;
-            if (row.contains(rowPattern[11]) || row.contains(rowPattern[11].reverse())) value += 780;
+            for (String rowPattern : rowPatterns.keySet()) {
+                if (row.contains(rowPattern) || row.contains(new StringBuilder(rowPattern).reverse())) {
+                    value += rowPatterns.get(rowPattern);
+                    if (stone != board.getTurn().getSide()) value -= rowPatterns.get(rowPattern)/10;
+                }
+            }
         }
         return value;
     }
@@ -122,8 +115,8 @@ public class ComputerLogic {
             for (int i = playedPoint.getVertical() - 2; i <= playedPoint.getVertical() + 2; i++) {
                 for (int j = playedPoint.getHorizontal() - 2; j <= playedPoint.getHorizontal() + 2; j++) {
                     if (i >= 0 && i < 15 && j >= 0 && j < 15 && board.get(i, j) == null &&
-                            !evaluatedTurns.contains(board.findPoint(i, j))) {
-                        BoardPoint currentPoint = board.findPoint(i, j);
+                            !evaluatedTurns.contains(new BoardPoint(i, j))) {
+                        BoardPoint currentPoint = new BoardPoint(i, j);
                         int offensiveTurnValue = evaluateTurn(board, currentPoint, board.getTurn().getSide());
                         int defensiveTurnValue = evaluateTurn(board, currentPoint, board.getTurn().getSide().opposite());
                         potentialTurns.put(offensiveTurnValue + defensiveTurnValue, currentPoint);
