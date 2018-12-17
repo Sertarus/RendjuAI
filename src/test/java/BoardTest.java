@@ -10,7 +10,7 @@ public class BoardTest {
 
     private Board clearBoard = new Board(15, 15);
 
-    private Player black = new Player(Stone.BLACK,null);
+    private Player black = new Player(Stone.BLACK, null);
 
     @Test
     public void getStonesOnBoard() {
@@ -41,7 +41,7 @@ public class BoardTest {
     @Test
     public void setTurn() {
         Board board = new Board(15, 15);
-        board.setTurn(new Player(Stone.WHITE,null));
+        board.setTurn(new Player(Stone.WHITE, null));
         assertEquals(Stone.WHITE, board.getTurn().getSide());
     }
 

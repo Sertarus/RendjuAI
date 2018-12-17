@@ -51,8 +51,6 @@ public class GameView extends Application {
 
     private AtomicInteger passesInARow = new AtomicInteger();
 
-    private ArrayList<BoardPoint> playedCells = new ArrayList<>();
-
     @Override
     public void start(Stage primaryStage) {
         final Stage choosePlayerDialog = new Stage(StageStyle.UNDECORATED);
@@ -130,18 +128,11 @@ public class GameView extends Application {
         restart.setOnAction(event -> {
             inProcess = false;
             board.clear();
-            if (board.getFirstPlayer().getComputerLogic() != null) {
-                board.getFirstPlayer().getComputerLogic().clearPotentialTurns();
-            }
-            if (board.getSecondPlayer().getComputerLogic() != null) {
-                board.getSecondPlayer().getComputerLogic().clearPotentialTurns();
-            }
             for (BoardPoint boardPoint : buttons.keySet()) {
                 updateBoard(boardPoint);
             }
             updateStatus();
             passesInARow.set(0);
-            playedCells.clear();
             if (!pass.getStyleClass().contains("pass1")) pass.getStyleClass().add("pass1");
             choosePlayerDialog.show();
             computerTurn();
@@ -291,7 +282,6 @@ public class GameView extends Application {
     private void updateBoard(BoardPoint boardPoint) {
         if (boardPoint == null) return;
         Stone stone = board.get(boardPoint);
-        playedCells.add(boardPoint);
         if (stone == Stone.BLACK) {
             Circle blackStone = new Circle(screenHeight * 2 / 75, screenHeight * 2 / 75, screenHeight * 13 / 600);
             if (buttons.get(boardPoint).getChildren().size() > 1) {
@@ -315,7 +305,7 @@ public class GameView extends Application {
 
     private void computerTurn() {
         if (inProcess && board.getTurn().getComputerLogic() != null) {
-            updateBoard(board.getTurn().getComputerLogic().makeComputerTurn(board, playedCells));
+            updateBoard(board.getTurn().getComputerLogic().makeComputerTurn(board));
             passesInARow.set(0);
             updateStatus();
         }

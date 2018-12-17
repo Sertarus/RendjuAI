@@ -18,6 +18,7 @@ public class Board {
 
     private Player secondPlayer = new Player(Stone.WHITE, null);
 
+    private ArrayList<BoardPoint> playedCells = new ArrayList<>();
 
     @NotNull
     private final Map<BoardPoint, Stone> stones = new HashMap<>();
@@ -53,6 +54,7 @@ public class Board {
         }
         stonesOnBoard = 0;
         turn = firstPlayer;
+        playedCells.clear();
     }
 
     @Nullable
@@ -74,12 +76,17 @@ public class Board {
         this.turn = turn;
     }
 
+    public ArrayList<BoardPoint> getPlayedCells() {
+        return playedCells;
+    }
+
     public BoardPoint makeTurn(int vertical, int horizontal) {
         BoardPoint boardPoint = new BoardPoint(vertical,horizontal);
         if (vertical < 0 || vertical >= width || horizontal < 0 || horizontal >= height) return null;
         if (stones.get(boardPoint) == null && (getTurn().getSide() == Stone.WHITE || isPlayable(boardPoint))) {
             stones.put(boardPoint, turn.getSide());
             stonesOnBoard++;
+            playedCells.add(boardPoint);
             if (turn == firstPlayer) turn = secondPlayer;
             else turn = firstPlayer;
             return boardPoint;

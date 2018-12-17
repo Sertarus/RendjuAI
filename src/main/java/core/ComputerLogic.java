@@ -4,9 +4,9 @@ package core;
 import java.util.*;
 
 public class ComputerLogic {
-    private TreeMap<Integer, BoardPoint> potentialTurns = new TreeMap<>();
 
     private static TreeMap<String, Integer> rowPatterns = new TreeMap<>();
+
     static {
         rowPatterns.put("SSSSS", 10000);
         rowPatterns.put("_SSSS_", 2000);
@@ -22,10 +22,11 @@ public class ComputerLogic {
         rowPatterns.put("__SSS__", 780);
     }
 
-    public BoardPoint makeComputerTurn(Board board, List<BoardPoint> playedCells) {
+    public BoardPoint makeComputerTurn(Board board) {
+        TreeMap<Integer, BoardPoint> potentialTurns = evaluateForLastTurn(board);
         if (potentialTurns.isEmpty() && board.get(7, 7) == null) board.makeTurn(7, 7);
         else {
-            evaluateForLastTurn(board, playedCells);
+
             BoardPoint bestTurn = potentialTurns.get(potentialTurns.lastKey());
             while (board.get(bestTurn) != null ||
                     (board.getTurn().getSide() == Stone.BLACK && !board.isPlayable(bestTurn))) {
@@ -42,10 +43,6 @@ public class ComputerLogic {
             return bestTurn;
         }
         return new BoardPoint(7, 7);
-    }
-
-    public void clearPotentialTurns() {
-        potentialTurns.clear();
     }
 
     private Integer evaluateTurn(Board board, BoardPoint boardPoint, Stone stone) {
@@ -102,16 +99,17 @@ public class ComputerLogic {
             for (String rowPattern : rowPatterns.keySet()) {
                 if (row.contains(rowPattern) || row.contains(new StringBuilder(rowPattern).reverse())) {
                     value += rowPatterns.get(rowPattern);
-                    if (stone != board.getTurn().getSide()) value -= rowPatterns.get(rowPattern)/10;
+                    if (stone != board.getTurn().getSide()) value -= rowPatterns.get(rowPattern) / 10;
                 }
             }
         }
         return value;
     }
 
-    private void evaluateForLastTurn(Board board, List<BoardPoint> playedCells) {
+    public TreeMap<Integer, BoardPoint> evaluateForLastTurn(Board board) {
+        TreeMap<Integer, BoardPoint> potentialTurns = new TreeMap<>();
         ArrayList<BoardPoint> evaluatedTurns = new ArrayList<>();
-        for (BoardPoint playedPoint : playedCells) {
+        for (BoardPoint playedPoint : board.getPlayedCells()) {
             for (int i = playedPoint.getVertical() - 2; i <= playedPoint.getVertical() + 2; i++) {
                 for (int j = playedPoint.getHorizontal() - 2; j <= playedPoint.getHorizontal() + 2; j++) {
                     if (i >= 0 && i < 15 && j >= 0 && j < 15 && board.get(i, j) == null &&
@@ -125,7 +123,7 @@ public class ComputerLogic {
                 }
             }
         }
+        return potentialTurns;
     }
 }
-
 
