@@ -12,12 +12,20 @@ public class ComputerLogicTest {
     private Player player = new Player(Stone.BLACK, null);
 
     @Test
+    public void evaluateTurn() {
+        for (int i = 0; i < 100; i++) {
+            Integer result = testLogic.evaluateTurn(board, new BoardPoint(7, 7), Stone.BLACK);
+            assertTrue(result >= 0 && result < 5);
+        }
+    }
+
+    @Test
     public void evaluateForLastTurn() {
         board.makeTurn(7, 7);
         for (int i = 0; i < 100; i++) {
             TreeMap<Integer, BoardPoint> result = testLogic.evaluateForLastTurn(board);
             assertTrue(result.size() > 0 && result.size() < 25);
-            assertTrue(result.lastKey() >= 153 && result.lastKey() <= 163);
+            assertTrue(result.lastKey() >= 153 && result.lastKey() <= 161);
         }
     }
 

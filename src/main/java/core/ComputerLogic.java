@@ -5,7 +5,7 @@ import java.util.*;
 
 public class ComputerLogic {
 
-    private static TreeMap<String, Integer> rowPatterns = new TreeMap<>();
+    private static HashMap<String, Integer> rowPatterns = new HashMap<>();
 
     static {
         rowPatterns.put("SSSSS", 10000);
@@ -45,7 +45,7 @@ public class ComputerLogic {
         return new BoardPoint(7, 7);
     }
 
-    private Integer evaluateTurn(Board board, BoardPoint boardPoint, Stone stone) {
+    public Integer evaluateTurn(Board board, BoardPoint boardPoint, Stone stone) {
         StringBuilder verticalRow = new StringBuilder();
         for (int i = -4; i <= 4; i++) {
             if (boardPoint.getHorizontal() + i < 0 || boardPoint.getHorizontal() + i > 15) continue;
